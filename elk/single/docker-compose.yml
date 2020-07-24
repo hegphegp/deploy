@@ -65,6 +65,7 @@ services:
       - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - ./logs/:/logs/
 #     - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
     links:
       - elasticsearch:elasticsearch
@@ -88,4 +89,20 @@ services:
     links:
       - elasticsearch:elasticsearch
 # 官方的 kibana:7.7.1 镜像的环境变量 elasticsearch.password and elasticsearch.username that should be ELASTICSEARCH_PASSWORD and ELASTICSEARCH_USERNAME instead
+
+  nginx:
+    restart: always
+    image: nginx:1.17.6-alpine
+#   container_name: nginx
+    ports:
+      - 8567:80
+    volumes:
+# 用下面命令在services/nginx路径生成多个html页面
+# for i in {1..20}; do echo "Page ${i}" > page${i}.html; done
+# for i in {1..200}; do j=$[$RANDOM%30+1]; curl -H 'User-Agent: Mozilla/5.0' http://localhost:8567/page${j}.html; done
+# ab -c 1 -n 1000 http://localhost:8567/page5.html
+      - ./config/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/nginx:/var/log/nginx
+      - ./services/nginx:/usr/share/nginx/html
 
