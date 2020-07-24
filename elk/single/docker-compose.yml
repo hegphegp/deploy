@@ -58,14 +58,17 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - LS_JAVA_OPTS=-Xms256m -Xmx256m
+# 下面这些变量在容器启动后，自动保存到 /usr/share/logstash/config/logstash.yml 文件
       - http.host=0.0.0.0
       - xpack.monitoring.enabled=true
       - xpack.monitoring.elasticsearch.username=elastic
       - xpack.monitoring.elasticsearch.password=changeme
       - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
+      - path.config=/usr/share/logstash/conf.d/*.conf
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./logs/:/logs/
+      - ./config/logstash/:/usr/share/logstash/conf.d/
+      - ./logs/nginx/:/var/log/nginx/access/
 #     - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
     links:
       - elasticsearch:elasticsearch
@@ -103,6 +106,6 @@ services:
 # ab -c 1 -n 1000 http://localhost:8567/page5.html
       - ./config/nginx/conf.d/:/etc/nginx/conf.d/
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./logs/nginx:/var/log/nginx
+      - ./logs/nginx/:/var/log/nginx/
       - ./services/nginx:/usr/share/nginx/html
 
