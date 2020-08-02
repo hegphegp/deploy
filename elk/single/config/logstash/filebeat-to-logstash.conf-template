@@ -1,0 +1,21 @@
+input {
+  beats {
+    port => 5044       # 监听5044用于接收Filebeat传来数据
+  }
+}
+filter {
+  grok {
+    match => {
+      "message" => "%{COMBINEDAPACHELOG}"      # 匹配HTTP的日志
+    }
+   remove_field => "message"                    # 不显示原信息，仅显示匹配后
+  }
+}
+output {
+  elasticsearch {
+    hosts => ["http://172.18.68.11:9200","http://172.18.68.12:9200","http://172.18.68.13:9200"]    # 集群IP
+    index => "logstash-%{+YYYY-MM-dd}"
+    action => "index"
+    document_type => "apache_logs"
+  }
+}

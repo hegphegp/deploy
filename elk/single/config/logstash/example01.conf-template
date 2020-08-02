@@ -1,0 +1,22 @@
+input {
+    file {
+        path=> [ "/tmp/nfs/*/*.txt" ]
+        discover_interval => 0
+        ignore_older => 864000
+        start_position => "beginning"
+    }
+}
+
+output {
+    kafka {
+        topic_id => "record_test"
+        codec => plain {
+            format => "%{message}"
+            charset => "UTF-8"
+        }
+        bootstrap_servers => "192.168.15.195:9092"
+    }
+    stdout{
+        codec=>rubydebug
+    }
+}

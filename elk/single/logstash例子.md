@@ -1,4 +1,6 @@
 #### nginx的log_format与logstash的filter配置对应的例子
+![avatar](imgs/img-0001.png)
+
 * nginx.conf
 ```
 log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '

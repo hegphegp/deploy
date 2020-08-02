@@ -1,0 +1,47 @@
+version: '3.3'
+
+services:
+  zookeeper01:
+    image: zookeeper:3.6.0
+    hostname: zookeeper01
+    container_name: zookeeper01
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    volumes:
+      - ./conf/zk/zk01/zoo.cfg:/conf/zoo.cfg
+
+  solr01:
+    image: solr:8.5.2-slim
+    restart: always
+    hostname: solr01
+    container_name: solr01
+#    links:
+#      - zookeeper01
+#      - solr02
+#      - solr03
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper01:2181"
+
+
+  solr02:
+    image: solr:8.5.2-slim
+    restart: always
+    hostname: solr02
+    container_name: solr02
+#    links:
+#      - zookeeper01
+#      - solr01
+#      - solr03
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper01:2181"
+
+  solr03:
+    image: solr:8.5.2-slim
+    restart: always
+    hostname: solr03
+    container_name: solr03
+#    links:
+#      - zookeeper01
+#      - solr01
+#      - solr03
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper01:2181"

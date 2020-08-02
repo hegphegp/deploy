@@ -48,28 +48,48 @@ services:
 #     - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
 #     - ./data/esdata:/usr/share/elasticsearch/data
 
-  logstash:
-    image: logstash:7.7.1
+# # logstash应该直接对接redis或者kafka的消息，不应该直接收集nginx日志，否则每台nginx服务器都要运行logstash服务
+#   logstash:
+#     image: logstash:7.7.1
+#     restart: always
+#     ports:
+#       - "5000:5000/tcp"
+#       - "5000:5000/udp"
+#       - "9600:9600"
+#     environment:
+#       - TZ=Asia/Shanghai
+#       - LS_JAVA_OPTS=-Xms256m -Xmx256m
+# # 下面这些变量在容器启动后，自动保存到 /usr/share/logstash/config/logstash.yml 文件
+#       - http.host=0.0.0.0
+#       - xpack.monitoring.enabled=true
+#       - xpack.monitoring.elasticsearch.username=elastic
+#       - xpack.monitoring.elasticsearch.password=changeme
+#       - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
+#       - path.config=/usr/share/logstash/conf.d/*.conf
+#     volumes:
+#       - /etc/localtime:/etc/localtime:ro
+#       - ./config/logstash/:/usr/share/logstash/conf.d/
+#       - ./logs/nginx/:/var/log/nginx/access/
+# #     - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+#     links:
+#       - elasticsearch:elasticsearch
+
+  filebeat:
+    image: filebeat:7.7.1
     restart: always
     ports:
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
+      - "5601:5601"
     environment:
       - TZ=Asia/Shanghai
-      - LS_JAVA_OPTS=-Xms256m -Xmx256m
-# 下面这些变量在容器启动后，自动保存到 /usr/share/logstash/config/logstash.yml 文件
-      - http.host=0.0.0.0
-      - xpack.monitoring.enabled=true
-      - xpack.monitoring.elasticsearch.username=elastic
-      - xpack.monitoring.elasticsearch.password=changeme
-      - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
-      - path.config=/usr/share/logstash/conf.d/*.conf
+      - server.name=kibana
+      - server.host=0.0.0.0
+      - i18n.locale=zh-CN
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./config/logstash/:/usr/share/logstash/conf.d/
-      - ./logs/nginx/:/var/log/nginx/access/
-#     - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+#     - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     links:
       - elasticsearch:elasticsearch
 

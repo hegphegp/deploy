@@ -1,0 +1,57 @@
+input { 
+    redis {
+        host => "10.10.0.98"
+        port => "6379"
+        key => "nginx-access117"
+        data_type => "list"
+        password => "OTdmOWI4ZTM4NTY1M2M4OTZh"
+        threads => 10
+        db => "1"
+    }
+}
+filter {
+    if [type] == "nginx-access-117" {
+        grok {
+            patterns_dir => [ "/etc/logstash/patterns.d" ]
+            match => { "message" => "%{NGINXACCESS}" }
+            overwrite => [ "message" ]
+        }
+        geoip {
+            source => "clent_ip"
+            target => "geoip"
+#             database => "/etc/logstash/GeoLiteCity.dat"
+            database => "/etc/logstash/GeoLite2-City.mmdb"
+        }
+        useragent {
+            source => "User_Agent"
+            target => "userAgent"
+        }
+        urldecode {
+            all_fields => true
+        }
+        mutate {
+            gsub => ["User_Agent","[\"]",""]        #将user_agent中的 " 换成空
+            convert => [ "response","integer" ]
+            convert => [ "body_bytes_sent","integer" ]
+            convert => [ "bytes_sent","integer" ]
+            convert => [ "upstream_response_time","float" ]
+            convert => [ "upstream_status","integer" ]
+            convert => [ "request_time","float" ]
+            convert => [ "port","integer" ]
+        }
+        date {
+            match => [ "timestamp" , "dd/MMM/YYYY:HH:mm:ss Z" ]
+        }
+    }
+}
+output {
+    if [type] == "nginx-access117" {
+        elasticsearch {
+            hosts => ["10.0.1.49:9200"]
+            index => "logstash-nginx-access-117-%{+YYYY.MM.dd}"
+            user => "elastic"
+            password => "linuxea"
+        }
+    }
+    stdout {codec => rubydebug}
+}
