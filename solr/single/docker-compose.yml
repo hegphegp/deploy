@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  solr:
+    image: solr:8.5.2-slim
+    restart: always
+    hostname: solr
+    container_name: solr
+    ports:
+      - "8983:8983"
